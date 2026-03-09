@@ -1,0 +1,313 @@
+{
+  "info": {
+    "name": "API de Pedidos - JWT Auth",
+    "description": "API REST para gerenciamento de pedidos com autenticação JWT.\n\nPrimeiro, registre um usuário ou faça login para obter o token JWT.\nO token é capturado automaticamente e usado nas requisições protegidas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Registrar Usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "    pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    console.log('Token JWT capturado:', response.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Registra um novo usuário no sistema e retorna token JWT.\n\nO token é automaticamente capturado e salvo para uso nas outras requisições."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "    pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    console.log('Token JWT capturado:', response.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Autentica usuário e retorna token JWT.\n\nO token é automaticamente capturado e salvo para uso nas outras requisições."
+          },
+          "response": []
+        },
+        {
+          "name": "Meu Perfil",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Retorna dados do usuário autenticado.\n\nRequer token JWT no header Authorization."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de autenticação e gerenciamento de usuários."
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Criar Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroPedido\": \"PED-001\",\n  \"valorTotal\": 150.50,\n  \"dataCriacao\": \"2026-03-09T10:30:00Z\",\n  \"items\": [\n    {\n      \"idItem\": \"2434\",\n      \"quantidadeItem\": 2,\n      \"valorItem\": 75.25\n    },\n    {\n      \"idItem\": \"5678\",\n      \"quantidadeItem\": 1,\n      \"valorItem\": 75.25\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["order"]
+            },
+            "description": "Cria um novo pedido com seus itens associados.\n\nRequer autenticação JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Pedidos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/order/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["order", "list"]
+            },
+            "description": "Lista todos os pedidos ordenados por data de criação (mais recentes primeiro).\n\nRequer autenticação JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Pedido por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/order/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["order", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "PED-001",
+                  "description": "ID único do pedido"
+                }
+              ]
+            },
+            "description": "Retorna os dados de um pedido específico pelo ID.\n\nRequer autenticação JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroPedido\": \"PED-001\",\n  \"valorTotal\": 200.00,\n  \"dataCriacao\": \"2026-03-09T10:30:00Z\",\n  \"items\": [\n    {\n      \"idItem\": \"2434\",\n      \"quantidadeItem\": 3,\n      \"valorItem\": 66.67\n    },\n    {\n      \"idItem\": \"9999\",\n      \"quantidadeItem\": 1,\n      \"valorItem\": 66.66\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/order/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["order", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "PED-001",
+                  "description": "ID único do pedido a ser atualizado"
+                }
+              ]
+            },
+            "description": "Atualiza um pedido existente e seus itens.\n\nOs itens antigos são substituídos pelos novos.\n\nRequer autenticação JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/order/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["order", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "PED-001",
+                  "description": "ID único do pedido a ser deletado"
+                }
+              ]
+            },
+            "description": "Remove um pedido e todos seus itens associados (cascade delete).\n\nRequer autenticação JWT."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints CRUD de pedidos. Todos requerem autenticação JWT."
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Verifica se a API está funcionando.\n\nNão requer autenticação."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
