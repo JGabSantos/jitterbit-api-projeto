@@ -46,6 +46,8 @@ MYSQL_HOST=localhost
 MYSQL_DATABASE=orders_db
 MYSQL_USER=root
 MYSQL_PASSWORD=sua_senha_aqui
+JWT_SECRET=troque_por_um_secret_forte
+JWT_EXPIRES_IN=1d
 ```
 
 ### 3. Criar Banco de Dados e Tabelas
@@ -72,6 +74,16 @@ CREATE TABLE items (
     KEY orderId (orderId),
     FOREIGN KEY (orderId) REFERENCES orders (orderId) ON DELETE CASCADE
 );
+
+  CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(120) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    passwordHash VARCHAR(255) NOT NULL,
+    createdAt DATETIME NOT NULL,
+    updatedAt DATETIME NOT NULL,
+    PRIMARY KEY (id)
+  );
 ```
 
 ### 4. Iniciar o Servidor
@@ -85,6 +97,48 @@ npm start
 O servidor estará disponível em: `http://localhost:3000`
 
 ## Endpoints da API
+
+### Autenticação
+
+#### Registrar usuário
+
+```http
+POST /auth/register
+Content-Type: application/json
+```
+
+Exemplo de body:
+
+```json
+{
+  "name": "Maria Silva",
+  "email": "maria@email.com",
+  "password": "123456"
+}
+```
+
+#### Login
+
+```http
+POST /auth/login
+Content-Type: application/json
+```
+
+Exemplo de body:
+
+```json
+{
+  "email": "maria@email.com",
+  "password": "123456"
+}
+```
+
+#### Usuário autenticado
+
+```http
+GET /auth/me
+Authorization: Bearer <token>
+```
 
 ### Health Check
 
@@ -108,6 +162,12 @@ Resposta de sucesso (HTTP 200):
 ### Criar Pedido
 
 Cria um novo pedido com seus itens associados.
+
+Requer autenticação JWT:
+
+```http
+Authorization: Bearer <token>
+```
 
 ```http
 POST /order
@@ -190,6 +250,12 @@ Possível erro (HTTP 409):
 
 Lista todos os pedidos existentes ordenados por data de criação.
 
+Requer autenticação JWT:
+
+```http
+Authorization: Bearer <token>
+```
+
 ```http
 GET /order/list
 ```
@@ -216,6 +282,12 @@ Resposta (HTTP 200):
 ### Buscar Pedido
 
 Retorna os dados de um pedido específico.
+
+Requer autenticação JWT:
+
+```http
+Authorization: Bearer <token>
+```
 
 ```http
 GET /order/:orderId
@@ -252,6 +324,12 @@ Erro quando não encontrado (HTTP 404):
 
 Atualiza um pedido existente e seus itens.
 
+Requer autenticação JWT:
+
+```http
+Authorization: Bearer <token>
+```
+
 ```http
 PUT /order/:orderId
 Content-Type: application/json
@@ -274,6 +352,12 @@ Resposta (HTTP 200):
 ### Deletar Pedido
 
 Remove um pedido e todos seus itens associados.
+
+Requer autenticação JWT:
+
+```http
+Authorization: Bearer <token>
+```
 
 ```http
 DELETE /order/:orderId
@@ -299,15 +383,21 @@ src/
 ├── config/
 │   └── database.js           Configuração Sequelize e pool de conexões
 ├── controllers/
+│   ├── authController.js     Controlador de autenticação
 │   └── orderController.js    Controladores para requisições HTTP
 ├── middlewares/
+│   ├── auth.js               Middleware de autenticação JWT
+│   ├── validateAuth.js       Validação de dados de autenticação
 │   └── validateOrder.js      Middlewares de validação de dados
 ├── models/
+│   ├── user.js               Modelo de Usuário
 │   ├── order.js              Modelo de Pedido
 │   └── item.js               Modelo de Item
 ├── routes/
+│   ├── authRoutes.js         Rotas de autenticação
 │   └── orderRoutes.js        Definição de rotas da API
 ├── services/
+│   ├── authService.js        Regras de negócio da autenticação
 │   └── orderService.js       Lógica de negócio da aplicação
 ├── utils/
 │   ├── errors.js             Classes de erro customizadas
@@ -337,6 +427,18 @@ Service (orderService.js) - Contém lógica de negócio
 Models (Order, Item) - Interage com banco de dados
     ↓
 Resposta HTTP
+```
+
+Para autenticação JWT, o fluxo é:
+
+```
+POST /auth/register ou POST /auth/login
+  ↓
+Retorno de token JWT
+  ↓
+Envio do token no header Authorization: Bearer <token>
+  ↓
+GET /auth/me
 ```
 
 ## Banco de Dados
@@ -369,6 +471,17 @@ A aplicação implementa um relacionamento um-para-muitos entre Pedidos e Itens:
 | quantity  | INT           | Quantidade do item                                           |
 | price     | DECIMAL(12,2) | Preço unitário do item                                       |
 
+**Tabela: users**
+
+| Campo        | Tipo         | Descrição                                         |
+| ------------ | ------------ | ------------------------------------------------- |
+| id           | INT          | Identificador único do usuário (PK, Auto Increment) |
+| name         | VARCHAR(120) | Nome do usuário                                   |
+| email        | VARCHAR(255) | E-mail único do usuário                           |
+| passwordHash | VARCHAR(255) | Hash da senha (bcrypt)                            |
+| createdAt    | DATETIME     | Data de criação                                   |
+| updatedAt    | DATETIME     | Data da última atualização                        |
+
 ## Configurações da Aplicação
 
 ### Variáveis de Ambiente
@@ -381,6 +494,8 @@ A aplicação implementa um relacionamento um-para-muitos entre Pedidos e Itens:
 | MYSQL_DATABASE | orders_db   | Nome do banco de dados                        |
 | MYSQL_USER     | root        | Usuário de acesso ao MySQL                    |
 | MYSQL_PASSWORD | -           | Senha de acesso ao MySQL                      |
+| JWT_SECRET     | -           | Chave secreta para assinatura dos tokens JWT  |
+| JWT_EXPIRES_IN | 1d          | Tempo de expiração do token JWT               |
 
 ### Pool de Conexões
 
@@ -405,6 +520,7 @@ A aplicação implementa um tratamento estruturado de erros com códigos HTTP ap
 | 201    | Recurso criado com sucesso (POST)                         |
 | 204    | Recurso deletado com sucesso (DELETE)                     |
 | 400    | Dados de entrada inválidos ou ausentes                    |
+| 401    | Não autorizado (token ausente, inválido ou expirado)      |
 | 404    | Recurso solicitado não foi encontrado                     |
 | 409    | Conflito - recurso já existe (duplicação)                 |
 | 503    | Serviço indisponível - erro na conexão com banco de dados |

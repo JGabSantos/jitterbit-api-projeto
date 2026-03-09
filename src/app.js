@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const orderRoutes = require("./routes/orderRoutes");
+const authRoutes = require("./routes/authRoutes");
 const { AppError } = require("./utils/errors");
 
 // Middleware para parsear JSON
@@ -8,6 +9,7 @@ app.use(express.json());
 
 // Rotas da API
 app.use(orderRoutes);
+app.use("/auth", authRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "API is running" });
@@ -47,6 +49,13 @@ app.use((err, req, res, next) => {
     return res.status(503).json({
       success: false,
       error: "Erro de conexão com o banco de dados",
+    });
+  }
+
+  if (err.name === "SequelizeUniqueConstraintError") {
+    return res.status(409).json({
+      success: false,
+      error: "Recurso já existe",
     });
   }
 

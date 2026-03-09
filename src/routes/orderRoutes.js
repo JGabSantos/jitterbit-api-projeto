@@ -11,6 +11,10 @@ const {
   validateOrderData,
   validateOrderId,
 } = require("../middlewares/validateOrder");
+const { authenticate } = require("../middlewares/auth");
+
+// Todas as rotas de pedidos exigem usuário autenticado.
+router.use(authenticate);
 
 router.post("/order", validateOrderData, createOrder);
 router.get("/order/list", listOrders);
