@@ -3,8 +3,7 @@ const orderService = require("../services/orderService");
 const { NotFoundError } = require("../utils/errors");
 
 /**
- * Cria um novo pedido
- * Mapeia dados da requisição e chama serviço de criação
+ * Controller para criação de pedido
  */
 async function createOrder(req, res, next) {
   try {
@@ -21,6 +20,9 @@ async function createOrder(req, res, next) {
   }
 }
 
+/**
+ * Controller para buscar pedido por ID
+ */
 async function getOrderById(req, res, next) {
   try {
     const order = await orderService.getOrderById(req.params.orderId);
@@ -38,6 +40,9 @@ async function getOrderById(req, res, next) {
   }
 }
 
+/**
+ * Controller para listar todos os pedidos
+ */
 async function listOrders(req, res, next) {
   try {
     const orders = await orderService.listOrders();
@@ -52,6 +57,9 @@ async function listOrders(req, res, next) {
   }
 }
 
+/**
+ * Controller para atualizar pedido
+ */
 async function updateOrder(req, res, next) {
   try {
     const mapped = mapRequestToOrder(req.body);
@@ -67,6 +75,9 @@ async function updateOrder(req, res, next) {
   }
 }
 
+/**
+ * Controller para deletar pedido
+ */
 async function deleteOrder(req, res, next) {
   try {
     await orderService.deleteOrder(req.params.orderId);

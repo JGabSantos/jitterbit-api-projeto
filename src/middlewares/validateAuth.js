@@ -4,6 +4,9 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/**
+ * Middleware de validação para registro de usuário
+ */
 function validateRegister(req, res, next) {
   try {
     const { name, email, password } = req.body;
@@ -32,6 +35,9 @@ function validateRegister(req, res, next) {
   }
 }
 
+/**
+ * Middleware de validação para login
+ */
 function validateLogin(req, res, next) {
   try {
     const { email, password } = req.body;

@@ -8,6 +8,10 @@ const {
   UnauthorizedError,
 } = require("../utils/errors");
 
+/**
+ * Obtém a chave secreta JWT do ambiente
+ * @throws {BadRequestError} Se JWT_SECRET não estiver configurado
+ */
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -17,12 +21,18 @@ function getJwtSecret() {
   return secret;
 }
 
+/**
+ * Gera um token JWT para o usuário
+ */
 function generateToken(user) {
   return jwt.sign({ sub: user.id, email: user.email }, getJwtSecret(), {
     expiresIn: process.env.JWT_EXPIRES_IN || "1d",
   });
 }
 
+/**
+ * Remove dados sensíveis do usuário (exclui passwordHash)
+ */
 function sanitizeUser(user) {
   return {
     id: user.id,
@@ -33,6 +43,10 @@ function sanitizeUser(user) {
   };
 }
 
+/**
+ * Registra um novo usuário no sistema
+ * @throws {ConflictError} Se o e-mail já estiver cadastrado
+ */
 async function register({ name, email, password }) {
   const exists = await User.findOne({ where: { email } });
   if (exists) {
@@ -48,6 +62,10 @@ async function register({ name, email, password }) {
   };
 }
 
+/**
+ * Autentica usuário e retorna token JWT
+ * @throws {UnauthorizedError} Se credenciais forem inválidas
+ */
 async function login({ email, password }) {
   const user = await User.findOne({ where: { email } });
   if (!user) {
@@ -65,6 +83,10 @@ async function login({ email, password }) {
   };
 }
 
+/**
+ * Busca dados do usuário autenticado pelo ID
+ * @throws {NotFoundError} Se usuário não for encontrado
+ */
 async function getMe(userId) {
   const user = await User.findByPk(userId);
   if (!user) {

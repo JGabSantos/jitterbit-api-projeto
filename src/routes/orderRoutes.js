@@ -13,7 +13,7 @@ const {
 } = require("../middlewares/validateOrder");
 const { authenticate } = require("../middlewares/auth");
 
-// Todas as rotas de pedidos exigem usuário autenticado.
+// Todas as rotas de pedidos exigem autenticação JWT
 router.use(authenticate);
 
 router.post("/order", validateOrderData, createOrder);

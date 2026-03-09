@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const { BadRequestError, UnauthorizedError } = require("../utils/errors");
 
+/**
+ * Middleware de autenticação JWT
+ * Valida token no header Authorization e extrai dados do usuário
+ */
 function authenticate(req, res, next) {
   try {
     const authHeader = req.headers.authorization;

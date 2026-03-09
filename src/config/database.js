@@ -9,13 +9,12 @@ const sequelize = new Sequelize(
   {
     host: process.env.MYSQL_HOST,
     dialect: "mysql",
-    logging: false, // Desativa logs SQL (ativar para debug)
-    // Pool de conexões para gerenciar múltiplas conexões
+    logging: false,
     pool: {
-      max: 5, // Máximo de conexões simultâneas
-      min: 0, // Mínimo de conexões
-      acquire: 30000, // Tempo máximo para adquirir conexão (ms)
-      idle: 10000, // Tempo máximo inativo (ms)
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
     },
   },
 );

@@ -12,6 +12,23 @@ API REST desenvolvida em **Node.js** com **Express**, **MySQL** e **Sequelize** 
 - Validação robusta de dados de entrada
 - Tratamento centralizado e estruturado de erros
 - Health check para monitoramento da API
+- Autenticação JWT completa (registro, login, rotas protegidas)
+- Documentação Postman para importar
+
+## Documentação Postman
+
+Para testar a API de forma completa, importe a coleção do Postman incluída no projeto:
+
+- Arquivo de coleção: `postman_collection.json`
+- Arquivo de environment: `postman_environment.json`
+- Guia de uso: Consulte [POSTMAN.md](POSTMAN.md) para instruções detalhadas
+
+A coleção inclui:
+
+- Todos os endpoints (autenticação + pedidos)
+- Captura automática de token JWT
+- Variáveis de ambiente pré-configuradas
+- Exemplos de requisições prontos para uso
 
 ## Requisitos do Sistema
 
@@ -473,14 +490,14 @@ A aplicação implementa um relacionamento um-para-muitos entre Pedidos e Itens:
 
 **Tabela: users**
 
-| Campo        | Tipo         | Descrição                                         |
-| ------------ | ------------ | ------------------------------------------------- |
+| Campo        | Tipo         | Descrição                                           |
+| ------------ | ------------ | --------------------------------------------------- |
 | id           | INT          | Identificador único do usuário (PK, Auto Increment) |
-| name         | VARCHAR(120) | Nome do usuário                                   |
-| email        | VARCHAR(255) | E-mail único do usuário                           |
-| passwordHash | VARCHAR(255) | Hash da senha (bcrypt)                            |
-| createdAt    | DATETIME     | Data de criação                                   |
-| updatedAt    | DATETIME     | Data da última atualização                        |
+| name         | VARCHAR(120) | Nome do usuário                                     |
+| email        | VARCHAR(255) | E-mail único do usuário                             |
+| passwordHash | VARCHAR(255) | Hash da senha (bcrypt)                              |
+| createdAt    | DATETIME     | Data de criação                                     |
+| updatedAt    | DATETIME     | Data da última atualização                          |
 
 ## Configurações da Aplicação
 

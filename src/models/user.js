@@ -1,6 +1,10 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
+/**
+ * Modelo de Usuário para autenticação JWT
+ * Hash de senha gerado via bcrypt no authService
+ */
 const User = sequelize.define(
   "User",
   {

@@ -1,5 +1,9 @@
 const { BadRequestError } = require("../utils/errors");
 
+/**
+ * Middleware de validação de dados do pedido
+ * Valida numeroPedido, valorTotal, dataCriacao e items
+ */
 function validateOrderData(req, res, next) {
   try {
     const { numeroPedido, valorTotal, dataCriacao, items } = req.body;
@@ -69,6 +73,9 @@ function validateOrderData(req, res, next) {
   }
 }
 
+/**
+ * Middleware de validação do parâmetro orderId
+ */
 function validateOrderId(req, res, next) {
   try {
     const { orderId } = req.params;

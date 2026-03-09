@@ -1,5 +1,8 @@
 const authService = require("../services/authService");
 
+/**
+ * Controller para registro de novo usuário
+ */
 async function register(req, res, next) {
   try {
     const result = await authService.register(req.body);
@@ -14,6 +17,9 @@ async function register(req, res, next) {
   }
 }
 
+/**
+ * Controller para autenticação de usuário
+ */
 async function login(req, res, next) {
   try {
     const result = await authService.login(req.body);
@@ -28,6 +34,9 @@ async function login(req, res, next) {
   }
 }
 
+/**
+ * Controller para buscar perfil do usuário autenticado
+ */
 async function me(req, res, next) {
   try {
     const user = await authService.getMe(req.auth.userId);
